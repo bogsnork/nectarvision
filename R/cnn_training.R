@@ -9,8 +9,10 @@ library(rjson)
 # library(magick) #may need terminal command: sudo apt-get install libmagick++-dev
 library(repurrrsive)
 library(listviewer)
-# library(magrittr)
 
+
+#image directory
+img_dir <- "data"
 
 #import prepped data - using import script
 # source("R/data_prep.R")
@@ -85,6 +87,21 @@ n_samples <- nrow(image_cats)
 train_indices <- sample(1:n_samples, 0.8 * n_samples)
 train_data <- image_cats[train_indices,]
 validation_data <- image_cats[-train_indices,]
+
+#image generator
+batch_size <- 10
+
+load_and_preprocess_image <- function(image_name, target_height, target_width) {
+  img_array <- image_load(
+    file.path(img_dir, image_name),
+    target_size = c(target_height, target_width)
+  ) %>%
+    image_to_array() %>%
+    xception_preprocess_input() 
+  dim(img_array) <- c(1, dim(img_array))
+  img_array
+}
+
 
 
 #classification generator
