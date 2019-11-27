@@ -12,8 +12,28 @@ library(listviewer)
 # library(magrittr)
 
 
-#import prepped data
-source("R/data_prep.R")
+#import prepped data - using import script
+# source("R/data_prep.R")
+
+#or import prepped data from folder
+boxinfo <- read_csv("data/boxinfo.csv")
+imageinfo_orig <- read_csv("data/imageinfo.csv")
+
+#create a category id field
+
+category <- unique(boxinfo$category)
+category_reordered <- category[order(category)]
+
+boxinfo %>% count(category) %>% data.frame()
+
+catinfo <- data.frame(category = category[order(category)], 
+                      category_id = 1:length(category))
+
+#merge them
+
+imageinfo <- imageinfo_orig %>%
+  inner_join(boxinfo, by = "image_id") %>%
+  inner_join(catinfo, by = c("category"))
  
 # Scaling---
 
@@ -23,14 +43,15 @@ source("R/data_prep.R")
 target_height <- 224
 target_width <- 224
 
-imageinfo <- imageinfo %>% mutate(
-  x_left_scaled = (x_left / image_width * target_width) %>% round(),
-  x_right_scaled = (x_right / image_width * target_width) %>% round(),
-  y_top_scaled = (y_top / image_height * target_height) %>% round(),
-  y_bottom_scaled = (y_bottom / image_height * target_height) %>% round(),
-  bbox_width_scaled =  (bbox_width / image_width * target_width) %>% round(),
-  bbox_height_scaled = (bbox_height / image_height * target_height) %>% round()
-)
+imageinfo <- imageinfo %>% 
+  mutate(
+    x_left_scaled = (x_left / image_width * target_width) %>% round(),
+    x_right_scaled = (x_right / image_width * target_width) %>% round(),
+    y_top_scaled = (y_top / image_height * target_height) %>% round(),
+    y_bottom_scaled = (y_bottom / image_height * target_height) %>% round(),
+    bbox_width_scaled =  (bbox_width / image_width * target_width) %>% round(),
+    bbox_height_scaled = (bbox_height / image_height * target_height) %>% round()
+  )
 
 
 #multiple object classification ----
@@ -49,10 +70,16 @@ image_cats <- imageinfo %>%
 
 image_cats <- data.frame(image_cats) %>%
   add_column(file_name = imageinfo$file_name, .before = TRUE)
+#at this stage we have a row per box, and 0 or 1 in each column showing which spp 
+#the box is tagged as.  There should only be one 1 as boxes only have one tag 
 
+#reduce to one line per image, multi 1 or 0 for spp
 image_cats <- image_cats %>% 
   group_by(file_name) %>% 
   summarise_all(.funs = funs(max))
+#we now have a row for each image, and a 0 or 1 for each spp.  there may be multiple 1's as 
+#images can have several species
+
 
 n_samples <- nrow(image_cats)
 train_indices <- sample(1:n_samples, 0.8 * n_samples)
