@@ -158,7 +158,7 @@ model %>% fit_generator(
   validation_steps = nrow(validation_data) / batch_size,
   callbacks = list(
     callback_model_checkpoint(
-      file.path("../models/multiclass", "weights.{epoch:02d}-{val_loss:.2f}.hdf5")
+      file.path("models/multiclass", "weights.{epoch:02d}-{val_loss:.2f}.hdf5")
     ),
     callback_early_stopping(patience = 2)
   )
