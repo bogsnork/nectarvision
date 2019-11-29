@@ -76,6 +76,10 @@ validation_data <- image_cats[-train_indices,]
 #image generator
 batch_size <- 10
 
+  #fix for OSError: image file is truncated
+PIL <- reticulate::import("PIL")
+PIL$ImageFile$LOAD_TRUNCATED_IMAGES <- TRUE
+
 load_and_preprocess_image <- function(image_name, target_height, target_width) {
   img_array <- image_load(
     file.path(img_dir, image_name),
