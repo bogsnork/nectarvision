@@ -27,6 +27,12 @@ imageinfo <- annotations$assets %>% map("asset") %>% {
   image_width = map_dbl(map(., "size"), "width"),
   )}
 
+#add a new file_name field to fix issue of spaces in filenames beign replaced with `%02` in VOTT:
+
+imageinfo <- mutate(imageinfo, 
+                    file_name_vott = file_name,
+                    file_name = str_replace_all(file_name, "%20", " "))
+
 
 #regions, rectangles and tags
 
