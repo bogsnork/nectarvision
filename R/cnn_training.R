@@ -12,31 +12,16 @@ library(listviewer)
 
 
 #image directory
-img_dir <- "data"
+img_dir <- "source_photos"
 
 #import prepped data - using import script
 # source("R/data_prep.R")
 
 #or import prepped data from folder
 boxinfo <- read_csv("data/boxinfo.csv")
-imageinfo_orig <- read_csv("data/imageinfo.csv")
+imageinfo <- read_csv("data/imageinfo.csv")
+catinfo <- read_csv("data/catinfo.csv")
 
-#create a category id field
-
-category <- unique(boxinfo$category)
-category_reordered <- category[order(category)]
-
-boxinfo %>% count(category) %>% data.frame()
-
-catinfo <- data.frame(category = category[order(category)], 
-                      category_id = 1:length(category))
-
-#merge them
-
-imageinfo <- imageinfo_orig %>%
-  inner_join(boxinfo, by = "image_id") %>%
-  inner_join(catinfo, by = c("category"))
- 
 # Scaling---
 
 # scale all bounding box coordinates according to the actual image size we’ll
