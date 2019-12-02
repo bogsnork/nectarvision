@@ -169,13 +169,12 @@ model %>% fit_generator(
     callback_early_stopping(patience = 2), #this stops training when a monitored quantity stops improving
     callback_tensorboard(
       log_dir = paste0("logs/fit/", descriptor, "_", format(Sys.time(), format = "%Y%m%d-%H%M")), 
-      histogram_freq = 0,
-      batch_size = 32, write_graph = TRUE, write_grads = TRUE,
-      write_images = TRUE, embeddings_freq = 1,
-      embeddings_layer_names = NULL, embeddings_metadata = NULL,
-      embeddings_data = NULL, update_freq = "epoch")
-  )
-)
+       histogram_freq = 0,
+       batch_size = 32, 
+      write_graph = TRUE, write_grads = TRUE,
+       write_images = TRUE)
+   )
+ )
 
 
 
