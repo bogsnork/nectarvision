@@ -14,6 +14,9 @@ library(listviewer)
 #image directory
 img_dir <- "source_photos"
 
+#descriptor - some descriptor to organise adn separate runs using this code from others
+descriptor <- "multiclass"
+
 #import prepped data - using import script
 # source("R/data_prep.R")
 
@@ -162,15 +165,22 @@ model %>% fit_generator(
   validation_steps = nrow(validation_data) / batch_size,
   callbacks = list(
     callback_model_checkpoint(
-      file.path("models/multiclass", "weights.{epoch:02d}-{val_loss:.2f}.hdf5")
-    ),
-    callback_early_stopping(patience = 2)
+      file.path("models", descriptor, "weights.{epoch:02d}-{val_loss:.2f}.hdf5")),
+    callback_early_stopping(patience = 2), #this stops training when a monitored quantity stops improving
+    callback_tensorboard(
+      log_dir = paste0("logs/fit/", descriptor, "_", format(Sys.time(), format = "%Y%m%d-%H%M")), 
+      histogram_freq = 0,
+      batch_size = 32, write_graph = TRUE, write_grads = TRUE,
+      write_images = TRUE, embeddings_freq = 1,
+      embeddings_layer_names = NULL, embeddings_metadata = NULL,
+      embeddings_data = NULL, update_freq = "epoch")
   )
 )
 
 
 
-
+history <- model
+plot(history)
 
 
 
