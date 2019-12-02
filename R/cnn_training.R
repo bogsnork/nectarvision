@@ -176,13 +176,14 @@ model %>% fit_generator(
    )
  )
 
+#save the model
+write_rds(model, path =  paste0("models/", descriptor, "/model_", format(Sys.time(), format = "%Y%m%d-%H%M"), ".rds"))
+
+# history <- model
+# plot(history)
 
 
-history <- model
-plot(history)
-
-
-
+tensorboard(log_dir = "logs/fit")
 
 
 
