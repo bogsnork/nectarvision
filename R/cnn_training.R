@@ -183,19 +183,42 @@ model %>% save_model_hdf5(paste0("models/", run_id, ".h5"))
 
 tensorboard(log_dir = "logs/fit")
 
+### have a look at some predictions
 
+#predict a single image
+image.row <- 350
+preds <-
+  model %>% predict(
+    load_and_preprocess_image(validation_data[image.row, "file_name"], 
+                              target_height, target_width),
+    batch_size = 1)
 
+preds.comp <- rbind(data.frame(validation_data[image.row, ]),
+      data.frame(validation_data[image.row, "file_name"], preds))
+names(preds.comp) <- c("file_name", catinfo$category)
 
+# 
+# #predict a subset
+# 
+# valid_extract <- validation_data[1:10, ]
+# 
+# 
+# for (i in nrow(valid_extract)) {
+#   preds <-
+#     model %>% predict(
+#       load_and_preprocess_image(valid_extract[i, "file_name"], 
+#                                 target_height, target_width),
+#       batch_size = 1
+#     )
+# 
+# }
+# 
 
-
-
-
-
-
-
-
-
-
+plot_image_with_boxes(train_1_8$file_name[i],
+                      train_1_8$name[i],
+                      train_1_8[i, 3:6] %>% as.matrix(),
+                      scaled = TRUE,
+                      box_pred = preds)
 
 
 
