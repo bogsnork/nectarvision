@@ -157,6 +157,8 @@ model %>% compile(optimizer = "adam",
 
 
 #fit model ----
+run_id <- paste0(descriptor, "_", format(Sys.time(), format = "%Y%m%d-%H%M"))
+
 model %>% fit_generator(
   train_gen,
   epochs = 20,
@@ -165,10 +167,10 @@ model %>% fit_generator(
   validation_steps = nrow(validation_data) / batch_size,
   callbacks = list(
     callback_model_checkpoint(
-      file.path("models", descriptor, "weights.{epoch:02d}-{val_loss:.2f}.hdf5")),
-    callback_early_stopping(patience = 2), #this stops training when a monitored quantity stops improving
+      file.path("models", paste0(run_id, "_weights.{epoch:02d}-{val_loss:.2f}.hdf5"))),
+    callback_early_stopping(patience = 2), #stops training when a monitored quantity stops improving
     callback_tensorboard(
-      log_dir = paste0("logs/fit/", descriptor, "_", format(Sys.time(), format = "%Y%m%d-%H%M")), 
+      log_dir = paste0("logs/fit/", run_id), 
        histogram_freq = 0,
        batch_size = 32, 
       write_graph = TRUE, write_grads = TRUE,
@@ -177,11 +179,7 @@ model %>% fit_generator(
  )
 
 #save the model
-write_rds(model, path =  paste0("models/", descriptor, "/model_", format(Sys.time(), format = "%Y%m%d-%H%M"), ".rds"))
-
-# history <- model
-# plot(history)
-
+model %>% save_model_hdf5(paste0("models/", run_id, ".h5"))
 
 tensorboard(log_dir = "logs/fit")
 
