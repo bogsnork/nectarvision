@@ -70,7 +70,7 @@ imageinfo4ssd <- imageinfo4ssd %>%
 
 # check
 
-example <- imageinfo4ssd[5,]
+example <- imageinfo4ssd[50,]
 img <- image_read(file.path(img_dir, example$file_name))
 category <- (example$category %>% str_split(pattern = ", "))[[1]]
 x_left <- (example$xl_orig %>% str_split(pattern = ", "))[[1]]
@@ -80,10 +80,8 @@ y_bottom <- (example$yb_orig %>% str_split(pattern = ", "))[[1]]
 
 img <- image_draw(img)
 for (i in 1:example$cnt) {
-  rect(x_left[i],
-       y_bottom[i],
-       x_right[i],
-       y_top[i],
+  rect(xleft = x_left[i], ybottom = y_bottom[i], 
+       xright = x_right[i], ytop = y_top[i],
        border = "white",
        lwd = 2)
   text(

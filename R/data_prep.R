@@ -104,10 +104,10 @@ imageinfo <- imageinfo_orig %>%
 #   droplevels()
 
 #tidy up and export----
-write_rds(boxinfo, "data/boxinfo.rds")
-write_rds(imageinfo_orig, "data/imageinfo_orig.rds")
-write_rds(imageinfo, "data/imageinfo.rds")
-write_rds(regions, "data/regions.rds")
+# write_rds(boxinfo, "data/boxinfo.rds")
+# write_rds(imageinfo_orig, "data/imageinfo_orig.rds")
+# write_rds(imageinfo, "data/imageinfo.rds")
+# write_rds(regions, "data/regions.rds")
 
 write.csv(imageinfo, "data/imageinfo.csv", row.names = F)
 write.csv(boxinfo, "data/boxinfo.csv", row.names = F)
