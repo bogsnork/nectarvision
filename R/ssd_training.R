@@ -24,6 +24,7 @@ descriptor <- "ssd"
 boxinfo <- read_csv("data/boxinfo.csv")
 imageinfo <- read_csv("data/imageinfo.csv")
 catinfo <- read_csv("data/catinfo.csv")
+n_classes <- nrow(catinfo)
 
 # Scaling---
 
@@ -290,6 +291,16 @@ ssd_generator <-
     }
   }
 
+
+#training generator ----
+
+train_gen <- ssd_generator(
+  imageinfo4ssd,
+  target_height = target_height,
+  target_width = target_width,
+  shuffle = TRUE,
+  batch_size = batch_size
+)
 
 #model ----
 
