@@ -6,7 +6,10 @@
 library(tidyverse)
 library(keras)
 library(rjson)
-library(magick) #may need terminal command: sudo apt-get install libmagick++-dev
+library(magick) #if magick installation fails, may need terminal command: sudo apt-get install libmagick++-dev
+                #if running docker container, need to run this from command line (of the virtual computer):
+                # sudo nvidia-docker exec sudo apt-get install libmagick++-dev -y
+                #then run install.packages("magick") again
 library(repurrrsive)
 library(listviewer)
 
@@ -80,15 +83,15 @@ y_top <- (example$yt_orig %>% str_split(pattern = ", "))[[1]]
 y_bottom <- (example$yb_orig %>% str_split(pattern = ", "))[[1]]
 
 img <- image_draw(img)
-for (i in 1:example$cnt) {
-  rect(xleft = x_left[i], ybottom = y_bottom[i], 
-       xright = x_right[i], ytop = y_top[i],
-       border = "white", lwd = 2)
-  text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = category[i], 
-       offset = 1, pos = 2, cex = 1, col = "white")
-}
-dev.off()
-print(img)
+# for (i in 1:example$cnt) {
+#   rect(xleft = x_left[i], ybottom = y_bottom[i], 
+#        xright = x_right[i], ytop = y_top[i],
+#        border = "white", lwd = 2)
+#   text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = category[i], 
+#        offset = 1, pos = 2, cex = 1, col = "white")
+# }
+# dev.off()
+# print(img)
 
 
 # define anchors
@@ -102,8 +105,8 @@ anchor_xs <- seq(anchor_offset, 1 - anchor_offset, length.out = 4) %>%
 anchor_ys <- seq(anchor_offset, 1 - anchor_offset, length.out = 4) %>%
   rep(cells_per_row)
 
-ggplot(data.frame(x = anchor_xs, y = anchor_ys), aes(x, y)) + geom_point() +
-  coord_cartesian(xlim = c(0,1), ylim = c(0,1)) + theme(aspect.ratio = 1)
+# ggplot(data.frame(x = anchor_xs, y = anchor_ys), aes(x, y)) + geom_point() +
+#   coord_cartesian(xlim = c(0,1), ylim = c(0,1)) + theme(aspect.ratio = 1)
 
 anchor_centers <- cbind(anchor_xs, anchor_ys)
 anchor_height_width <- matrix(1 / cells_per_row, nrow = 16, ncol = 2)
@@ -133,19 +136,19 @@ img <- image_read(file.path(img_dir, example$file_name))
 img <- image_resize(img, geometry = "224x224!")
 img <- image_draw(img)
 
-for (i in 1:example$cnt) {
-  rect(x_left[i], y_bottom[i], x_right[i], y_top[i],
-       border = "white", lwd = 2)
-  text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = category[i],
-    offset = 0, pos = 2, cex = 0.4, col = "white")
-}
-for (i in 1:nrow(anchor_corners)) {
-  rect(anchor_corners[i, 1] * 224, anchor_corners[i, 4] * 224,
-    anchor_corners[i, 3] * 224, anchor_corners[i, 2] * 224,
-    border = "cyan", lwd = 1, lty = 3)
-}
-dev.off()
-print(img)
+# for (i in 1:example$cnt) {
+#   rect(x_left[i], y_bottom[i], x_right[i], y_top[i],
+#        border = "white", lwd = 2)
+#   text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = category[i],
+#     offset = 0, pos = 2, cex = 0.4, col = "white")
+# }
+# for (i in 1:nrow(anchor_corners)) {
+#   rect(anchor_corners[i, 1] * 224, anchor_corners[i, 4] * 224,
+#     anchor_corners[i, 3] * 224, anchor_corners[i, 2] * 224,
+#     border = "cyan", lwd = 1, lty = 3)
+# }
+# dev.off()
+# print(img)
 
 #choose which bounding box is evaluated in which anchor box (using Intersection over Union)
 # overlaps shape is: number of ground truth objects * number of grid cells
@@ -354,7 +357,8 @@ bbox_output <-
 model <- keras_model(inputs = input, outputs = list(class_output, bbox_output))
 
 #loss function ----
-# shapes are batch_size * 16 * 21
+
+  # shapes are batch_size * 16 * 21
 class_loss <- function(y_true, y_pred) {
   class_loss  <-
     tf$nn$sigmoid_cross_entropy_with_logits(labels = y_true, logits = y_pred)
@@ -364,7 +368,7 @@ class_loss <- function(y_true, y_pred) {
 }
 
 
-# shapes are batch_size * 16 * 4
+  # shapes are batch_size * 16 * 4
 bbox_loss <- function(y_true, y_pred) {
   # calculate localization loss for all boxes where ground truth was assigned some overlap
   # calculate mask
