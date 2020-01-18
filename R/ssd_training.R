@@ -12,6 +12,7 @@ library(magick) #if magick installation fails, may need terminal command: sudo a
                 #then run install.packages("magick") again
 library(repurrrsive)
 library(listviewer)
+library(reticulate)
 
 
 #image directory
@@ -357,7 +358,7 @@ bbox_output <-
 model <- keras_model(inputs = input, outputs = list(class_output, bbox_output))
 
 #loss function ----
-
+tf <- import("tensorflow")
   # shapes are batch_size * 16 * 21
 class_loss <- function(y_true, y_pred) {
   class_loss  <-
