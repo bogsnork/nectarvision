@@ -223,6 +223,25 @@ threshold <- 0.4
 
 class_background <- 21
 
+  #fix for OSError: image file is truncated
+PIL <- reticulate::import("PIL")
+PIL$ImageFile$LOAD_TRUNCATED_IMAGES <- TRUE
+
+#image generator
+load_and_preprocess_image <- function(image_name, target_height, target_width) {
+  img_array <- image_load(
+    file.path(img_dir, image_name),
+    target_size = c(target_height, target_width)
+  ) %>%
+    image_to_array() %>%
+    xception_preprocess_input() 
+  dim(img_array) <- c(1, dim(img_array))
+  img_array
+}
+
+
+#data generator ctd
+
 ssd_generator <-
   function(data,
            target_height,
