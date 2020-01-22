@@ -8,7 +8,7 @@ library(keras)
 library(rjson)
 library(magick) #if magick installation fails, may need terminal command: sudo apt-get install libmagick++-dev
                 #if running docker container, need to run this from command line (of the virtual computer):
-                # sudo nvidia-docker exec sudo apt-get install libmagick++-dev -y
+                # sudo nvidia-docker exec [containername] sudo apt-get install libmagick++-dev -y
                 #then run install.packages("magick") again
 library(repurrrsive)
 library(listviewer)
