@@ -221,7 +221,7 @@ image_size <- target_width # same as height
 
 threshold <- 0.4
 
-class_background <- 21
+class_background <- 21 #the index of the class which indicates background (i.e. not a target feature)
 
   #fix for OSError: image file is truncated
 PIL <- reticulate::import("PIL")
