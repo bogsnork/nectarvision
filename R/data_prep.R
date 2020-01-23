@@ -114,3 +114,25 @@ write.csv(boxinfo, "data/boxinfo.csv", row.names = F)
 write.csv(catinfo, "data/catinfo.csv", row.names = F)
 
 
+
+# prepare for github.com/skeydan tutorial format ----
+
+imageinfo_forskeydan <- imageinfo %>% 
+  select(id = image_id, file_name, image_height, image_width,    
+         category_id, x_left, y_top, bbox_width, bbox_height, 
+         y_bottom, x_right, name = category)
+
+
+catinfo_forskeydan <- catinfo %>% 
+  select(id = category_id, name = category)
+
+
+boxinfo_forskeydan <- boxinfo %>% 
+  full_join(catinfo_forskeydan, by = c("category"="name")) %>% 
+  select(image_id, category_id = id, x_left, y_top,  bbox_width, bbox_height, 
+         y_bottom, x_right)
+
+
+write.csv(imageinfo_forskeydan, "data/imageinfo_forskeydan.csv", row.names = F)
+write.csv(boxinfo_forskeydan, "data/boxinfo_forskeydan.csv", row.names = F)
+write.csv(catinfo_forskeydan, "data/catinfo_forskeydan.csv", row.names = F)
