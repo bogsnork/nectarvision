@@ -24,10 +24,11 @@ descriptor <- "ssd"
 #import prepped data - using import script
 # source("R/data_prep.R")
 
+
 #or import prepped data from folder
-boxinfo <- read_csv("data/boxinfo.csv")
-imageinfo <- read_csv("data/imageinfo.csv")
-catinfo <- read_csv("data/catinfo.csv")
+boxinfo <- read_csv("data/boxinfo_forskeydan.csv")  #read_csv("data/boxinfo.csv")
+imageinfo <- read_csv("data/imageinfo_forskeydan.csv")  #read_csv("data/imageinfo.csv")
+catinfo <- read_csv("data/catinfo_forskeydan.csv")  #read_csv("data/catinfo.csv")
 n_classes <- nrow(catinfo)
 
 # Scaling---
@@ -53,7 +54,7 @@ imageinfo <- imageinfo %>%
 #aggregate all information on a single image into a single row.
 
 imageinfo4ssd <- imageinfo %>%
-  select(category_id, file_name, category,
+  select(category_id, file_name, name,
          x_left, y_top, x_right, y_bottom,
          ends_with("scaled"))
 
@@ -61,7 +62,7 @@ imageinfo4ssd <- imageinfo4ssd %>%
   group_by(file_name) %>%
   summarise(
     categories = toString(category_id),
-    category = toString(category),
+    name = toString(name),
     xl = toString(x_left_scaled),
     yt = toString(y_top_scaled),
     xr = toString(x_right_scaled),
@@ -73,28 +74,6 @@ imageinfo4ssd <- imageinfo4ssd %>%
     cnt = n()
   )
 
-# check
-
-example <- imageinfo4ssd[50,]
-img <- image_read(file.path(img_dir, example$file_name))
-category <- (example$category %>% str_split(pattern = ", "))[[1]]
-x_left <- (example$xl_orig %>% str_split(pattern = ", "))[[1]]
-x_right <- (example$xr_orig %>% str_split(pattern = ", "))[[1]]
-y_top <- (example$yt_orig %>% str_split(pattern = ", "))[[1]]
-y_bottom <- (example$yb_orig %>% str_split(pattern = ", "))[[1]]
-
-img <- image_draw(img)
-# for (i in 1:example$cnt) {
-#   rect(xleft = x_left[i], ybottom = y_bottom[i], 
-#        xright = x_right[i], ytop = y_top[i],
-#        border = "white", lwd = 2)
-#   text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = category[i], 
-#        offset = 1, pos = 2, cex = 1, col = "white")
-# }
-# dev.off()
-# print(img)
-
-
 # define anchors
 
 cells_per_row <- 4
@@ -105,9 +84,6 @@ anchor_xs <- seq(anchor_offset, 1 - anchor_offset, length.out = 4) %>%
   rep(each = cells_per_row)
 anchor_ys <- seq(anchor_offset, 1 - anchor_offset, length.out = 4) %>%
   rep(cells_per_row)
-
-# ggplot(data.frame(x = anchor_xs, y = anchor_ys), aes(x, y)) + geom_point() +
-#   coord_cartesian(xlim = c(0,1), ylim = c(0,1)) + theme(aspect.ratio = 1)
 
 anchor_centers <- cbind(anchor_xs, anchor_ys)
 anchor_height_width <- matrix(1 / cells_per_row, nrow = 16, ncol = 2)
@@ -123,35 +99,6 @@ hw2corners <- function(centers, height_width) {
 }
 anchor_corners <- hw2corners(anchor_centers, anchor_height_width)
 
-
-#visualise an example: 
-example <- imageinfo4ssd[50, ]
-category <- (example$category %>% str_split(pattern = ", "))[[1]]
-x_left <- (example$xl %>% str_split(pattern = ", "))[[1]]
-x_right <- (example$xr %>% str_split(pattern = ", "))[[1]]
-y_top <- (example$yt %>% str_split(pattern = ", "))[[1]]
-y_bottom <- (example$yb %>% str_split(pattern = ", "))[[1]]
-
-
-img <- image_read(file.path(img_dir, example$file_name))
-img <- image_resize(img, geometry = "224x224!")
-img <- image_draw(img)
-
-# for (i in 1:example$cnt) {
-#   rect(x_left[i], y_bottom[i], x_right[i], y_top[i],
-#        border = "white", lwd = 2)
-#   text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = category[i],
-#     offset = 0, pos = 2, cex = 0.4, col = "white")
-# }
-# for (i in 1:nrow(anchor_corners)) {
-#   rect(anchor_corners[i, 1] * 224, anchor_corners[i, 4] * 224,
-#     anchor_corners[i, 3] * 224, anchor_corners[i, 2] * 224,
-#     border = "cyan", lwd = 1, lty = 3)
-# }
-# dev.off()
-# print(img)
-
-#choose which bounding box is evaluated in which anchor box (using Intersection over Union)
 # overlaps shape is: number of ground truth objects * number of grid cells
 map_to_ground_truth <- function(overlaps) {
   
@@ -325,6 +272,10 @@ train_gen <- ssd_generator(
   batch_size = batch_size
 )
 
+batch <- train_gen() #is this necessary?
+# c(x, c(y1, y2)) %<-% batch 
+# dim(y1) 
+
 #model ----
 
 feature_extractor <- application_resnet50(
@@ -415,7 +366,6 @@ model %>% compile(
     class_output = custom_metric("class_loss", metric_fn = class_loss),
     bbox_output = custom_metric("bbox_loss", metric_fn = bbox_loss))
 )
-
 
 # train model ----
 
