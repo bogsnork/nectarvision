@@ -168,7 +168,7 @@ image_size <- target_width # same as height
 
 threshold <- 0.4
 
-class_background <- 21 #the index of the class which indicates background (i.e. not a target feature)
+class_background <- n_classes #the number of classes
 
   #fix for OSError: image file is truncated
 PIL <- reticulate::import("PIL")
@@ -272,7 +272,7 @@ train_gen <- ssd_generator(
   batch_size = batch_size
 )
 
-batch <- train_gen() #is this necessary?
+#batch <- train_gen() #is this necessary?
 # c(x, c(y1, y2)) %<-% batch 
 # dim(y1) 
 
