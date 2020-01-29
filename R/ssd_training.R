@@ -272,7 +272,7 @@ train_gen <- ssd_generator(
   batch_size = batch_size
 )
 
-batch <- train_gen() #is this necessary?
+#batch <- train_gen() #is this necessary?
 # c(x, c(y1, y2)) %<-% batch 
 # dim(y1) 
 
