@@ -168,7 +168,7 @@ image_size <- target_width # same as height
 
 threshold <- 0.4
 
-class_background <- n_classes #the number of classes
+class_background <- 28  #n_classes #the number of classes
 
   #fix for OSError: image file is truncated
 PIL <- reticulate::import("PIL")
@@ -240,7 +240,7 @@ ssd_generator <-
         gt_class <- classes[gt_idx]
         
         pos <- gt_overlap > threshold
-        gt_class[gt_overlap < threshold] <- 21
+        gt_class[gt_overlap < threshold] <- 28
         
         # columns correspond to objects
         boxes <- rbind(xl, yt, xr, yb)
@@ -301,9 +301,9 @@ common <- feature_extractor$output %>%
   layer_batch_normalization()
 
 class_output <-
-  layer_conv_2d(common, filters = 21, kernel_size = 3,
+  layer_conv_2d(common, filters = 28, kernel_size = 3,
     padding = "same", name = "class_conv") %>%
-  layer_reshape(target_shape = c(16, 21), name = "class_output")
+  layer_reshape(target_shape = c(16, 28), name = "class_output")
 
 bbox_output <-
   layer_conv_2d(common, filters = 4, kernel_size = 3,
