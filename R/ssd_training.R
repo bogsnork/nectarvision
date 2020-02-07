@@ -274,9 +274,13 @@ train_gen <- ssd_generator(
   batch_size = batch_size
 )
 
-#batch <- train_gen() #is this necessary?
-# c(x, c(y1, y2)) %<-% batch 
-# dim(y1) 
+#test the generator
+batch <- train_gen() #generate one batch
+c(x, c(y1, y2)) %<-% batch #extract list elements
+dim(y1) #classes
+dim(y2) #bounding boxes
+dim(x) #image tensor
+
 
 #model ----
 
