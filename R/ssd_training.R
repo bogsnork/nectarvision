@@ -211,6 +211,7 @@ ssd_generator <-
       y1 <- array(0, dim = c(length(indices), 16))
       y2 <- array(0, dim = c(length(indices), 16, 4))
       
+      k <- 1 #counter for images within batch
       for (j in 1:length(indices)) {
         x[j, , , ] <-
           load_and_preprocess_image(data[[indices[j], "file_name"]], target_height, target_width)
@@ -253,12 +254,14 @@ ssd_generator <-
         y1[j, ] <- as.integer(gt_class) - 1
         y2[j, , ] <- gt_bbox
         
+        #print some output to monitor progress 
+        print(paste("Image: ", k, "   Image Name: ", data[[indices[j], "file_name"]]))        
+        k <- k + 1
       }
       
       x <- x %>% imagenet_preprocess_input()
       y1 <- y1 %>% to_categorical(num_classes = class_background)
-      print(data[[indices[j], "file_name"]])
-      print(xl) #print some output to monitor progress
+
       list(x, list(y1, y2))
     }
   }
