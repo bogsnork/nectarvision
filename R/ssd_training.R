@@ -257,6 +257,8 @@ ssd_generator <-
       
       x <- x %>% imagenet_preprocess_input()
       y1 <- y1 %>% to_categorical(num_classes = class_background)
+      print(data[[indices[j], "file_name"]])
+      print(xl) #print some output to monitor progress
       list(x, list(y1, y2))
     }
   }
@@ -373,6 +375,7 @@ steps_per_epoch <- nrow(imageinfo4ssd) / batch_size
 
 model %>% fit_generator(
   train_gen,
+  verbose = 2,
   steps_per_epoch = steps_per_epoch,
   epochs = 5,
   callbacks = callback_model_checkpoint(
