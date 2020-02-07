@@ -276,8 +276,8 @@ train_gen <- ssd_generator(
   imageinfo4ssd,
   target_height = target_height,
   target_width = target_width,
-  shuffle = FALSE,
-  #shuffle = TRUE,
+  #shuffle = FALSE,
+  shuffle = TRUE,
   batch_size = batch_size
 )
 
