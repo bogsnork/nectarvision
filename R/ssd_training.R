@@ -74,6 +74,9 @@ imageinfo4ssd <- imageinfo4ssd %>%
     cnt = n()
   )
 
+imageinfo4ssd <- imageinfo4ssd %>% filter(name != "NA") 
+
+
 # define anchors
 
 cells_per_row <- 4
@@ -168,7 +171,7 @@ image_size <- target_width # same as height
 
 threshold <- 0.4
 
-class_background <- 21 #the index of the class which indicates background (i.e. not a target feature)
+class_background <- 28  #n_classes #the number of classes
 
   #fix for OSError: image file is truncated
 PIL <- reticulate::import("PIL")
@@ -211,6 +214,7 @@ ssd_generator <-
       y1 <- array(0, dim = c(length(indices), 16))
       y2 <- array(0, dim = c(length(indices), 16, 4))
       
+      k <- 1 #counter for images within batch
       for (j in 1:length(indices)) {
         x[j, , , ] <-
           load_and_preprocess_image(data[[indices[j], "file_name"]], target_height, target_width)
@@ -240,7 +244,7 @@ ssd_generator <-
         gt_class <- classes[gt_idx]
         
         pos <- gt_overlap > threshold
-        gt_class[gt_overlap < threshold] <- 21
+        gt_class[gt_overlap < threshold] <- 28
         
         # columns correspond to objects
         boxes <- rbind(xl, yt, xr, yb)
@@ -253,10 +257,14 @@ ssd_generator <-
         y1[j, ] <- as.integer(gt_class) - 1
         y2[j, , ] <- gt_bbox
         
+        #print some output to monitor progress 
+        print(paste("Image: ", k, "   Image Name: ", data[[indices[j], "file_name"]]))        
+        k <- k + 1
       }
       
       x <- x %>% imagenet_preprocess_input()
       y1 <- y1 %>% to_categorical(num_classes = class_background)
+
       list(x, list(y1, y2))
     }
   }
@@ -268,13 +276,18 @@ train_gen <- ssd_generator(
   imageinfo4ssd,
   target_height = target_height,
   target_width = target_width,
+  #shuffle = FALSE,
   shuffle = TRUE,
   batch_size = batch_size
 )
 
-batch <- train_gen() #is this necessary?
-# c(x, c(y1, y2)) %<-% batch 
-# dim(y1) 
+#test the generator
+batch <- train_gen() #generate one batch
+c(x, c(y1, y2)) %<-% batch #extract list elements
+dim(y1) #classes
+dim(y2) #bounding boxes
+dim(x) #image tensor
+
 
 #model ----
 
@@ -301,9 +314,9 @@ common <- feature_extractor$output %>%
   layer_batch_normalization()
 
 class_output <-
-  layer_conv_2d(common, filters = 21, kernel_size = 3,
+  layer_conv_2d(common, filters = 28, kernel_size = 3,
     padding = "same", name = "class_conv") %>%
-  layer_reshape(target_shape = c(16, 21), name = "class_output")
+  layer_reshape(target_shape = c(16, 28), name = "class_output")
 
 bbox_output <-
   layer_conv_2d(common, filters = 4, kernel_size = 3,
@@ -373,6 +386,7 @@ steps_per_epoch <- nrow(imageinfo4ssd) / batch_size
 
 model %>% fit_generator(
   train_gen,
+  verbose = 2,
   steps_per_epoch = steps_per_epoch,
   epochs = 5,
   callbacks = callback_model_checkpoint(
