@@ -395,7 +395,7 @@ model %>% fit_generator(
     callback_model_checkpoint(
       "weights.{epoch:02d}-{loss:.2f}.hdf5",
       save_weights_only = TRUE),
-    callback_early_stopping(patience = 2), #stops training when a monitored quantity stops improving
+    #callback_early_stopping(patience = 2), #stops training when a monitored quantity stops improving
     callback_tensorboard(
       log_dir = paste0("logs/", run_id), 
       histogram_freq = 0,
