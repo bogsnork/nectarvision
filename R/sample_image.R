@@ -1,40 +1,49 @@
-#function to print sample image
+#' Print a sample image with bounding boxes and labels. 
+#'
+#' \code{sample_image} prints a sample image with bounding boxes and labels to a graphics device.
+#'
+#' 
+#' @param img_data requires a dataframe or tibble containing data for image.  I must contain at least the following variables: 
+#' "file_name" (name of the image), 
+#' "categories" (vector of category codes in image), 
+#' "name" (vector of category names in image), 
+#' "xl_orig", "yt_orig", "xr_orig", "yb_orig" (vectors of left, top, right and bottom coordinate values of the bounding boxes in the image)
+#' @param img_no a numeric value indicating the row index of the desired image.  
+#' @param label either "categories" or "name" indicating whether to print the category name or the category code. 
+#' @param cex a numeric determining the size of the label text.
 
-example <- imageinfo4ssd[50,]
-
-category <- (example$categories %>% str_split(pattern = ", "))[[1]]
-name <- (example$name %>% str_split(pattern = ", "))[[1]]
-x_left <- (example$xl_orig %>% str_split(pattern = ", "))[[1]]
-x_right <- (example$xr_orig %>% str_split(pattern = ", "))[[1]]
-y_top <- (example$yt_orig %>% str_split(pattern = ", "))[[1]]
-y_bottom <- (example$yb_orig %>% str_split(pattern = ", "))[[1]]
-
-cex <- 4
-## Background rectangle: 
-
-pad <- 0.1 #proportion to pad box by
- 
-img <- image_read(file.path(img_dir, example$file_name))
-img <- image_draw(img)
-textHeight <- graphics::strheight(category, cex = cex)
-textWidth <- graphics::strwidth(category, cex = cex)
-for (i in 1:example$cnt) {
-  rect(xleft = x_left[i], ybottom = y_bottom[i],
-       xright = x_right[i], ytop = y_top[i],
-       border = "white", lwd = 5)
- rect(xleft = as.integer(x_right[i]) - (textWidth[i] * (1 + pad)), 
-     ybottom = as.integer(y_top[i]) - (textHeight[i] * (1 + pad)), 
-     xright = as.integer(x_right[i]) + (textWidth[i] * pad), 
-     ytop = as.integer(y_top[i]) + (textHeight[i] * pad),
-     col = "white", border = NA) 
- text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = category[i], 
-    cex = cex, 
-    adj = c(1,1), 
-    col = "black", vfont = c("sans serif", "bold"))
+sample_image <- function(img_data, img_no,  label = "categories", cex = 4){
+  imginfo <- img_data[img_no,]
+  category <- (imginfo$categories %>% str_split(pattern = ", "))[[1]]
+  name <- (imginfo$name %>% str_split(pattern = ", "))[[1]]
+  x_left <- (imginfo$xl_orig %>% str_split(pattern = ", "))[[1]]
+  x_right <- (imginfo$xr_orig %>% str_split(pattern = ", "))[[1]]
+  y_top <- (imginfo$yt_orig %>% str_split(pattern = ", "))[[1]]
+  y_bottom <- (imginfo$yb_orig %>% str_split(pattern = ", "))[[1]]
+  
+  pad <- 0.1 #proportion to pad box by
+  
+  img <- image_read(file.path(img_dir, imginfo$file_name))
+  img <- image_draw(img)
+  textHeight <- graphics::strheight(category, cex = cex)
+  textWidth <- graphics::strwidth(category, cex = cex)
+  for (i in 1:imginfo$cnt) {
+    rect(xleft = x_left[i], ybottom = y_bottom[i],
+         xright = x_right[i], ytop = y_top[i],
+         border = "white", lwd = 5)
+    rect(xleft = as.integer(x_right[i]) - (textWidth[i] * (1 + pad)), 
+         ybottom = as.integer(y_top[i]) - (textHeight[i] * (1 + pad)), 
+         xright = as.integer(x_right[i]) + (textWidth[i] * pad), 
+         ytop = as.integer(y_top[i]) + (textHeight[i] * pad),
+         col = "white", border = NA) 
+    text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = category[i], 
+         cex = cex, 
+         adj = c(1,1), 
+         col = "black", vfont = c("sans serif", "bold"))
+  }
+  
+  dev.off()
+  print(img)
 }
-
-dev.off()
-print(img)
-
 
 
