@@ -81,8 +81,11 @@ imageinfo4ssd <- imageinfo4ssd %>%
 
 imageinfo4ssd <- imageinfo4ssd %>% filter(name != "NA") 
 
+#write_rds(imageinfo4ssd, path = "data/imageinfo4ssd.RData")
+
 #show an example image: 
-sample_image(img_data = imageinfo4ssd, file_name = "random")
+sample_image(img_data = imageinfo4ssd, img_name = "random")
+sample_image(img_data = imageinfo4ssd, img_name = "IMG_3019.JPG")
 
 # define anchors
 
