@@ -8,14 +8,21 @@
 #' "categories" (vector of category codes in image), 
 #' "name" (vector of category names in image), 
 #' "xl_orig", "yt_orig", "xr_orig", "yb_orig" (vectors of left, top, right and bottom coordinate values of the bounding boxes in the image)
-#' @param img_no a numeric value indicating the row index of the desired image.  
+#' @param img_name either filename of an image or "random".
+#' @param img_dir name of the image directory if it is in the working directory, or alternatively a filepath. Defaults to "source_photos".  
 #' @param label either "categories" or "name" indicating whether to print the category name or the category code. 
 #' @param cex a numeric determining the size of the label text.
 
-sample_image <- function(img_data, img_no,  label = "categories", cex = 4){
-  imginfo <- img_data[img_no,]
-  category <- (imginfo$categories %>% str_split(pattern = ", "))[[1]]
-  name <- (imginfo$name %>% str_split(pattern = ", "))[[1]]
+sample_image <- function(img_data, img_name = "random",  img_dir = "source_photos", label = "categories", cex = 4){
+  
+  ifelse(img_name == "random", 
+         imginfo <- img_data[sample(nrow(img_data), 1),], #select a random image
+         imginfo <- img_data[which(img_data$file_name == img_name),]) #or select chosen image
+  
+  ifelse(label == "name", 
+         label <- (imginfo$name %>% str_split(pattern = ", "))[[1]], #prep category name as label
+         label <- (imginfo$categories %>% str_split(pattern = ", "))[[1]]) #prep category code as label
+  
   x_left <- (imginfo$xl_orig %>% str_split(pattern = ", "))[[1]]
   x_right <- (imginfo$xr_orig %>% str_split(pattern = ", "))[[1]]
   y_top <- (imginfo$yt_orig %>% str_split(pattern = ", "))[[1]]
@@ -25,8 +32,8 @@ sample_image <- function(img_data, img_no,  label = "categories", cex = 4){
   
   img <- image_read(file.path(img_dir, imginfo$file_name))
   img <- image_draw(img)
-  textHeight <- graphics::strheight(category, cex = cex)
-  textWidth <- graphics::strwidth(category, cex = cex)
+  textHeight <- graphics::strheight(label, cex = cex)
+  textWidth <- graphics::strwidth(label, cex = cex)
   for (i in 1:imginfo$cnt) {
     rect(xleft = x_left[i], ybottom = y_bottom[i],
          xright = x_right[i], ytop = y_top[i],
@@ -36,7 +43,7 @@ sample_image <- function(img_data, img_no,  label = "categories", cex = 4){
          xright = as.integer(x_right[i]) + (textWidth[i] * pad), 
          ytop = as.integer(y_top[i]) + (textHeight[i] * pad),
          col = "white", border = NA) 
-    text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = category[i], 
+    text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = label[i], 
          cex = cex, 
          adj = c(1,1), 
          col = "black", vfont = c("sans serif", "bold"))

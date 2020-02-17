@@ -6,16 +6,17 @@
 library(tidyverse)
 library(keras)
 library(rjson)
-library(magick) #if magick installation fails, may need terminal command: sudo apt-get install libmagick++-dev
-                #if running docker container, need to run this from command line (of the virtual computer):
-                #> sudo nvidia-docker exec [containername] sudo apt-get install libmagick++-dev -y
-                #possibly also gsfonts
-                #> sudo nvidia-docker exec [containername] sudo apt-get install gsfonts -y
-                #then run install.packages("magick") again
 library(repurrrsive)
 library(listviewer)
 library(reticulate)
-
+library(magick) #if magick installation fails: 
+#try install.packages("magick", repos = "cloud.r-project.org")
+#if no luck, in linux, may need terminal command: sudo apt-get install libmagick++-dev
+#if running docker container, need to run this from command line (of the virtual computer):
+#> sudo nvidia-docker exec [containername] sudo apt-get install libmagick++-dev -y
+#possibly also gsfonts
+#> sudo nvidia-docker exec [containername] sudo apt-get install gsfonts -y
+#then run install.packages("magick", repos = "cloud.r-project.org") again
 
 #image directory
 img_dir <- "source_photos"
@@ -26,6 +27,8 @@ descriptor <- "ssd"
 #import prepped data - using import script
 # source("R/data_prep.R")
 
+#import additional functions
+source("R/sample_image.R")
 
 #or import prepped data from folder
 boxinfo <- read_csv("data/boxinfo_forskeydan.csv")  #read_csv("data/boxinfo.csv")
@@ -78,6 +81,8 @@ imageinfo4ssd <- imageinfo4ssd %>%
 
 imageinfo4ssd <- imageinfo4ssd %>% filter(name != "NA") 
 
+#show an example image: 
+sample_image(img_data = imageinfo4ssd, file_name = "random")
 
 # define anchors
 
