@@ -1,0 +1,45 @@
+---
+title: "Sample Images"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load_packages_etc, include=FALSE}
+#load packages 
+library(tidyverse)
+library(keras)
+#library(rjson)
+#library(repurrrsive)
+#library(listviewer)
+library(reticulate)
+library(magick)
+
+#load functions
+source("../R/sample_image.R")
+
+#load data
+imageinfo4ssd <- read_rds("../data/imageinfo4ssd.RData")
+```
+
+```{r variables, include=FALSE}
+#define variables
+sourcepath <- "../source_photos"
+```
+
+
+## Tagged Images
+
+```{r}
+img_blank <- image_read(file.path(sourcepath, imageinfo4ssd$file_name[sample(nrow(imageinfo4ssd),1)]))
+img_blank <- image_draw(img_blank)
+```
+
+
+
+```{r}
+print(sample_image(img_data = imageinfo4ssd, img_dir = sourcepath))
+```
+
