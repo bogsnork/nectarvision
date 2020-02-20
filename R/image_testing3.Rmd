@@ -1,0 +1,75 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(cowplot)
+library(magick)
+```
+
+
+
+```{r}
+#image directory
+img_dir <- "example_photos"
+
+#import additional functions
+source("../R/sample_image.R")
+
+```
+
+```{r}
+ex_files <- list.files("../example_photos")
+
+ex_fp <- file.path("..", img_dir, "IMG_4567.JPG")
+
+img <- image_read(file.path("..", img_dir, "IMG_4567.JPG"))
+
+```
+
+
+
+```{r}
+ggdraw(p) + draw_image(image = ex_fp, x = 0, y = 0) #+ draw_plot(p)
+```
+
+```{r}
+#get dimensions of image
+nrow(img)
+dim(img)
+
+ggdraw(img) + draw_image(img)
+tempfile()
+```
+
+```{r}
+  img <- magick::image_transparent(
+    magick::image_read(logo_file),
+    color = "white"
+  )
+  img2 <- magick::image_negate(img)
+  ggplot(data.frame(x = 1:3, y = 1:3), aes(x, y)) +
+    geom_point(size = 3) +
+    geom_abline(slope = 1, intercept = 0, linetype = 2, color = "blue") +
+    draw_image(img , x = 1, y = 1, scale = .9) +
+    draw_image(img2, x = 2, y = 2, scale = .9)
+
+```
+
+```{r}
+p <- ggplot(mtcars, aes(disp, mpg)) + 
+  geom_point(size = 1.5, color = "blue") +
+  theme_cowplot(12)
+
+logo_file <- system.file("extdata", "logo.png", package = "cowplot")
+
+ggdraw(p) + 
+  draw_image(logo_file, x = 1, y = 1, hjust = 1, vjust = 1, width = 0.13, height = 0.2)
+
+ggdraw() + 
+  draw_image(logo_file, scale = 0.5) +
+  draw_plot(p)
+```
+
