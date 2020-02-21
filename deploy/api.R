@@ -2,7 +2,8 @@
 
 library(keras)
 
-
+models_directory <- "models/ssd_20200213-1727" #name of directory where weights are stored
+selected_weights <- "weights.05-13.17.hdf5"  #name of weights file
 #define the model exactly as in training ----
 
 
@@ -70,8 +71,7 @@ bbox_output <-
 model <- keras_model(inputs = input, outputs = list(class_output, bbox_output))
 
 # load the model weights ----
-load_model_weights_tf(model, "model_weights_directory_path") # [need to change this]
-
+model %>% load_model_weights_hdf5(filepath = models_directory) # [this isn't working]
 
 # decode and reshape input ----
 
