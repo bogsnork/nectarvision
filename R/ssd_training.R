@@ -188,7 +188,7 @@ PIL <- reticulate::import("PIL")
 PIL$ImageFile$LOAD_TRUNCATED_IMAGES <- TRUE
 
 #image generator
-load_and_preprocess_image <- function(image_name, target_height, target_width) {
+load_and_preprocess_image <- function(image_name, target_height, target_width, img_dir = "source_photos") {
   img_array <- image_load(
     file.path(img_dir, image_name),
     target_size = c(target_height, target_width)
