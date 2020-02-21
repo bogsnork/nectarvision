@@ -402,12 +402,10 @@ model %>% fit_generator(
   steps_per_epoch = steps_per_epoch,
   epochs = 5,
   callbacks = list(
-    callback_model_checkpoint(
-      "weights.{epoch:02d}-{loss:.2f}.hdf5",
+    callback_model_checkpoint(filepath = file.path("models", run_id, ""),
       save_weights_only = TRUE),
-    #callback_early_stopping(patience = 2), #stops training when a monitored quantity stops improving
     callback_tensorboard(
-      log_dir = paste0("logs/", run_id), 
+      log_dir = file.path("logs", run_id), 
       histogram_freq = 0,
       write_graph = TRUE, write_grads = TRUE,
       write_images = TRUE)
