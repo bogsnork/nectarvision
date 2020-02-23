@@ -17,6 +17,7 @@ library(magick) #if magick installation fails:
 #possibly also gsfonts
 #> sudo nvidia-docker exec [containername] sudo apt-get install gsfonts -y
 #then run install.packages("magick", repos = "cloud.r-project.org") again
+library(here)
 
 #image directory
 img_dir <- "source_photos"
@@ -25,15 +26,15 @@ img_dir <- "source_photos"
 descriptor <- "ssd"
 
 #import prepped data - using import script
-# source("R/data_prep.R")
+# source(file.path(here(), "R/data_prep.R"))
 
 #import additional functions
-source("R/sample_image.R")
+source(file.path(here(), "R/sample_image.R"))
 
 #or import prepped data from folder
-boxinfo <- read_csv("data/boxinfo_forskeydan.csv")  #read_csv("data/boxinfo.csv")
-imageinfo <- read_csv("data/imageinfo_forskeydan.csv")  #read_csv("data/imageinfo.csv")
-catinfo <- read_csv("data/catinfo_forskeydan.csv")  #read_csv("data/catinfo.csv")
+boxinfo <- read_csv(file.path(here(), "data/boxinfo_forskeydan.csv"))  #read_csv("data/boxinfo.csv"))
+imageinfo <- read_csv(file.path(here(), "data/imageinfo_forskeydan.csv"))  #read_csv("data/imageinfo.csv"))
+catinfo <- read_csv(file.path(here(), "data/catinfo_forskeydan.csv"))  #read_csv("data/catinfo.csv"))
 n_classes <- nrow(catinfo)
 
 # Scaling---
