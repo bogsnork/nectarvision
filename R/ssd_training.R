@@ -287,7 +287,7 @@ ssd_generator <-
 
 
 #training generator ----
-
+  #This generates the inputs to the model, in batches.  
 train_gen <- ssd_generator(
   imageinfo4ssd,
   target_height = target_height,

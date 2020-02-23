@@ -42,7 +42,7 @@ names(df_box_raw) <- c("xl", "yt", "xr", "yb")
 #try anchor centres instead
 df_anchor_centers <- data.frame(anchor_centers)
 df_box_ac <- df_box_raw + cbind(df_anchor_centers, df_anchor_centers)
-
+names(df_box_ac) <- c("xl", "yt", "xr", "yb")
 
 #pred_cat is the ?probability? of each of the 28 classes matching a given box.
 df_cat <- matrix(pred_cat, nrow = 16, ncol = 28, byrow = T) %>% data.frame()
@@ -54,7 +54,8 @@ library(magick)
 
 pad <- 0.1 #proportion to pad box by
 img <- image_read(file.path(img_dir, img_name))
-df_box <- df_box_ac
+df_box <- df_anchor_corners
+names(df_box) <- c("xl", "yt", "xr", "yb")
 
 #rescale
 x_left <- df_box$xl * image_info(img)[[1,"width"]]
