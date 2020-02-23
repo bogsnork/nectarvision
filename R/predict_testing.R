@@ -1,13 +1,13 @@
 library(tidyverse)
 library(keras)
-img_name <- "IMG_4664.JPG"
+img_name <- "IMG_5277.JPG"
 img_dir = "example_photos"
  
-# pred <- model$predict(x = load_and_preprocess_image(image_name = img_name, 
-#                                                     target_height = 224, 
-#                                                     target_width = 224, 
-#                                                     img_dir = img_dir))
-# saveRDS(pred, "data/pred.rds")
+pred <- model$predict(x = load_and_preprocess_image(image_name = img_name,
+                                                    target_height = 224,
+                                                    target_width = 224,
+                                                    img_dir = img_dir))
+saveRDS(pred, "data/pred_IMG_5277_ssd_20200223-1957.rds")
 
 pred <- read_rds("data/pred.rds")
 
@@ -27,7 +27,6 @@ str(pred_cat)
 str(pred_box)
 
 pred_cat[,2,1]
-dimnames(pred_cat)
 
 #the output is always 16 boxes (although some may have 0 coordinates).  pred_box
 #is the four coordinates, 16 times, 
@@ -39,10 +38,10 @@ names(df_box_raw) <- c("xl", "yt", "xr", "yb")
 # names(df_anchor_corners) <- c("a_xl", "a_yt", "a_xr", "a_yb")
 # df_box_ac <- df_box_raw + df_anchor_corners
 
-#try anchor centres instead
-df_anchor_centers <- data.frame(anchor_centers)
-df_box_ac <- df_box_raw + cbind(df_anchor_centers, df_anchor_centers)
-names(df_box_ac) <- c("xl", "yt", "xr", "yb")
+# #try anchor centres instead
+# df_anchor_centers <- data.frame(anchor_centers)
+# df_box_ac <- df_box_raw + cbind(df_anchor_centers, df_anchor_centers)
+# names(df_box_ac) <- c("xl", "yt", "xr", "yb")
 
 #pred_cat is the ?probability? of each of the 28 classes matching a given box.
 df_cat <- matrix(pred_cat, nrow = 16, ncol = 28, byrow = T) %>% data.frame()
@@ -54,7 +53,7 @@ library(magick)
 
 pad <- 0.1 #proportion to pad box by
 img <- image_read(file.path(img_dir, img_name))
-df_box <- df_anchor_corners
+df_box <- df_box_raw
 names(df_box) <- c("xl", "yt", "xr", "yb")
 
 #rescale
@@ -84,3 +83,23 @@ for (i in 1:nrow(df_box)) {
 
 dev.off()
 print(img)
+
+#predidct all photos in example_dir
+img_seld <- list.files(img_dir)
+
+preds_l <- c()
+
+for(i in 1:length(img_seld)){
+pred <- model$predict(x = load_and_preprocess_image(image_name = img_seld[i],
+                                                    target_height = 224,
+                                                    target_width = 224,
+                                                    img_dir = img_dir))
+preds_l <- cbind(preds, list(pred))
+print(img_seld[i])
+}
+names(preds_l) <- img_seld 
+
+saveRDS(preds, "data/preds_expl_ssd_20200223-1957.rds")
+
+warnings()
+preds
