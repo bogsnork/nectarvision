@@ -43,6 +43,7 @@ names(df_box_raw) <- c("xl", "yt", "xr", "yb")
 df_anchor_centers <- data.frame(anchor_centers)
 df_box_ac <- df_box_raw + cbind(df_anchor_centers, df_anchor_centers)
 
+
 #pred_cat is the ?probability? of each of the 28 classes matching a given box.
 df_cat <- matrix(pred_cat, nrow = 16, ncol = 28, byrow = T) %>% data.frame()
 names(df_cat) <- 1:28
