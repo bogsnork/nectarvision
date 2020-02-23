@@ -3,10 +3,10 @@ library(keras)
 img_name <- "IMG_4664.JPG"
 img_dir = "example_photos"
  
-pred <- model$predict(x = load_and_preprocess_image(image_name = img_name, 
-                                                    target_height = 224, 
-                                                    target_width = 224, 
-                                                    img_dir = img_dir))
+# pred <- model$predict(x = load_and_preprocess_image(image_name = img_name, 
+#                                                     target_height = 224, 
+#                                                     target_width = 224, 
+#                                                     img_dir = img_dir))
 # saveRDS(pred, "data/pred.rds")
 
 pred <- read_rds("data/pred.rds")
@@ -30,11 +30,17 @@ pred_cat[,2,1]
 dimnames(pred_cat)
 
 #the output is always 16 boxes (although some may have 0 coordinates).  pred_box
-#is the four coordinates, 16 times, pred_cat is the ?probability? of each of the
-#28 classes matching a given box.
-df_box <- matrix(pred_box, nrow = 16, ncol = 4, byrow = T) %>% data.frame()
-names(df_box) <- c("xl", "yt", "xr", "yb")
+#is the four coordinates, 16 times, 
+df_box_raw <- matrix(pred_box, nrow = 16, ncol = 4, byrow = T) %>% data.frame()
+names(df_box_raw) <- c("xl", "yt", "xr", "yb")
 
+#or is it actually the offset from the anchor centre? or anchor corner?  Lets try: 
+df_anchor_corners <- data.frame(anchor_corners)
+names(df_anchor_corners) <- c("a_xl", "a_yt", "a_xr", "a_yb")
+
+df_box_ac <- df_box_raw + df_anchor_corners
+
+#pred_cat is the ?probability? of each of the 28 classes matching a given box.
 df_cat <- matrix(pred_cat, nrow = 16, ncol = 28, byrow = T) %>% data.frame()
 names(df_cat) <- 1:28
 
@@ -43,8 +49,8 @@ names(df_cat) <- 1:28
 library(magick)
 
 pad <- 0.1 #proportion to pad box by
-
 img <- image_read(file.path(img_dir, img_name))
+df_box <- df_box_ac
 
 #rescale
 x_left <- df_box$xl * image_info(img)[[1,"width"]]

@@ -104,6 +104,12 @@ anchor_height_width <- matrix(1 / cells_per_row, nrow = 16, ncol = 2)
 #defines anchor centres, height and width
 anchors <- cbind(anchor_centers, anchor_height_width)
 
+#visualise anchors
+ggplot(data.frame(x = anchor_xs, y = anchor_ys), aes(x, y)) +
+  geom_point() +
+  coord_cartesian(xlim = c(0,1), ylim = c(0,1)) +
+  theme(aspect.ratio = 1)
+
 #defines grid cell corners
 # cells are indicated by (xl, yt, xr, yb)
 # successive rows first go down in the image, then to the right
