@@ -34,11 +34,14 @@ dimnames(pred_cat)
 df_box_raw <- matrix(pred_box, nrow = 16, ncol = 4, byrow = T) %>% data.frame()
 names(df_box_raw) <- c("xl", "yt", "xr", "yb")
 
-#or is it actually the offset from the anchor centre? or anchor corner?  Lets try: 
-df_anchor_corners <- data.frame(anchor_corners)
-names(df_anchor_corners) <- c("a_xl", "a_yt", "a_xr", "a_yb")
+# #or is it actually the offset from the anchor centre? or anchor corner?  Lets try: 
+# df_anchor_corners <- data.frame(anchor_corners)
+# names(df_anchor_corners) <- c("a_xl", "a_yt", "a_xr", "a_yb")
+# df_box_ac <- df_box_raw + df_anchor_corners
 
-df_box_ac <- df_box_raw + df_anchor_corners
+#try anchor centres instead
+df_anchor_centers <- data.frame(anchor_centers)
+df_box_ac <- df_box_raw + cbind(df_anchor_centers, df_anchor_centers)
 
 #pred_cat is the ?probability? of each of the 28 classes matching a given box.
 df_cat <- matrix(pred_cat, nrow = 16, ncol = 28, byrow = T) %>% data.frame()
