@@ -324,10 +324,27 @@ head(bbox)
 ```
 
 ```{r}
+# #lets visualise
+# img_gg <- image_read(path = file.path(here(), "data/temp_img.png")) 
+# 
+# anch_gg <-image_graph(width = image_info(img_gg)[["width"]], height = image_info(img_gg)[["height"]])
+#  ggplot(anchor_data, aes(x, y)) +
+#   geom_rect(aes(xmin = xl, xmax = xr, ymin = yb, ymax = yt), colour = "blue", fill = "none") +
+#   geom_point() +
+#   geom_text(aes(label = id), colour = "red", nudge_x = 0.065, nudge_y = 0.065) +
+#   coord_cartesian(xlim = c(0,1), ylim = c(0,1)) +
+#   theme(aspect.ratio = 1) + theme_minimal()
+# dev.off()
+# image_composite(img_gg, anch_gg, operator = "overlay")
+```
+
+
+```{r}
 overlaps
 ```
-So here we can see that 
-```{r}        
+So here we can see the jaccard index of each pair of cell and ground truth box 
+```{r echo=T}        
+# 
         c(gt_overlap, gt_idx) %<-% map_to_ground_truth(overlaps)
         gt_class <- classes[gt_idx]
         
@@ -344,8 +361,11 @@ So here we can see that
         
         y1[j, ] <- as.integer(gt_class) - 1
         y2[j, , ] <- gt_bbox
-        
+
+gt_class; as.integer(gt_class) -1                
 ```
+
+
 
 
 ```{r}
@@ -355,8 +375,56 @@ So here we can see that
       list(x, list(y1, y2))
    # }
   #}
+```
+
+
+
+```{r}
+#lets have a look at the inputs - there are 16 images per batch but we've only processed one image so far, so we're just going to look at the first element in each array:
+paste("x"); head(x[1,,,])  #this is the image array containing the pixel values and the three colour channels.  I'll abbreviate it
+paste("y1");y1[1,,] #this is the classes array, for the 16 selected bounding boxes and the 28 categories.  We can see that it's selected 5 boxes for cat 4, 2 for cat 14, 2 for cat 15, and 7 for cat 28.  cat 10 is in the original but not represented in the processed data.  
+paste("y2");y2[1,,] #this is the bounding box array.  4 coordinates for each bounding box 
 
 ```
+
+
+```{r}
+#lets have a look
+df_box_sels <- data.frame(y2[1,,]); names(df_box_sels) <- c("xl", "yt", "xr", "yb")
+pad <- 0.1 #proportion to pad box by
+img <- image_read(file.path(img_dir, img_name))
+df_box <- df_box_sels
+names(df_box) <- c("xl", "yt", "xr", "yb")
+
+#rescale
+x_left <- df_box$xl * image_info(img)[[1,"width"]]
+x_right <- df_box$xr * image_info(img)[[1,"width"]]
+y_top <- df_box$yt * image_info(img)[[1,"height"]]
+y_bottom <- df_box$yb * image_info(img)[[1,"height"]]
+
+
+img <- image_draw(img)
+# textHeight <- graphics::strheight(label, cex = cex)
+# textWidth <- graphics::strwidth(label, cex = cex)
+for (i in 1:nrow(df_box)) {
+  rect(xleft = x_left[i], ybottom = y_bottom[i],
+       xright = x_right[i], ytop = y_top[i],
+       border = "white", lwd = 5)
+  # rect(xleft = as.integer(x_right[i]) - (textWidth[i] * (1 + pad)), 
+  #      ybottom = as.integer(y_top[i]) - (textHeight[i] * (1 + pad)), 
+  #      xright = as.integer(x_right[i]) + (textWidth[i] * pad), 
+  #      ytop = as.integer(y_top[i]) + (textHeight[i] * pad),
+  #      col = "white", border = NA) 
+  # text(x = as.integer(x_right[i]), y = as.integer(y_top[i]), labels = label[i], 
+  #      cex = cex, 
+  #      adj = c(1,1), 
+  #      col = "black", vfont = c("sans serif", "bold"))
+}
+
+dev.off()
+print(img)
+```
+
 
 ```{r}
 #training generator ----
