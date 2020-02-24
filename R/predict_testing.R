@@ -3,13 +3,13 @@ library(keras)
 img_name <- "IMG_5277.JPG"
 img_dir = "example_photos"
  
-pred <- model$predict(x = load_and_preprocess_image(image_name = img_name,
-                                                    target_height = 224,
-                                                    target_width = 224,
-                                                    img_dir = img_dir))
-saveRDS(pred, "data/pred_IMG_5277_ssd_20200223-1957.rds")
+# pred <- model$predict(x = load_and_preprocess_image(image_name = img_name,
+#                                                     target_height = 224,
+#                                                     target_width = 224,
+#                                                     img_dir = img_dir))
+# saveRDS(pred, "data/pred_IMG_5277_ssd_20200223-1957.rds")
 
-pred <- read_rds("data/pred.rds")
+pred <- read_rds(file.path(here(), "data/pred_IMG_5277_ssd_20200223-1957.rds"))
 
 str(pred)
 
@@ -30,7 +30,7 @@ pred_cat[,2,1]
 
 #the output is always 16 boxes (although some may have 0 coordinates).  pred_box
 #is the four coordinates, 16 times, 
-df_box_raw <- matrix(pred_box, nrow = 16, ncol = 4, byrow = T) %>% data.frame()
+df_box_raw <- matrix(pred_box, nrow = 16, ncol = 4, byrow = F) %>% data.frame()
 names(df_box_raw) <- c("xl", "yt", "xr", "yb")
 
 # #or is it actually the offset from the anchor centre? or anchor corner?  Lets try: 
@@ -84,7 +84,7 @@ for (i in 1:nrow(df_box)) {
 dev.off()
 print(img)
 
-#predidct all photos in example_dir
+#predidct all photos in example_dir----
 img_seld <- list.files(img_dir)
 
 preds_l <- c()
