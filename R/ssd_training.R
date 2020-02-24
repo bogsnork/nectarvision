@@ -275,7 +275,7 @@ ssd_generator <-
         y2[j, , ] <- gt_bbox
         
         #print some output to monitor progress 
-        print(paste("Image: ", k, "   Image Name: ", data[[indices[j], "file_name"]]))        
+        #print(paste("Image: ", k, "   Image Name: ", data[[indices[j], "file_name"]]))        
         k <- k + 1
       }
       
@@ -298,12 +298,12 @@ train_gen <- ssd_generator(
   batch_size = batch_size
 )
 
-#test the generator
-batch <- train_gen() #generate one batch
-c(x, c(y1, y2)) %<-% batch #extract list elements
-dim(y1) #classes
-dim(y2) #bounding boxes
-dim(x) #image tensor
+# #test the generator
+# batch <- train_gen() #generate one batch
+# c(x, c(y1, y2)) %<-% batch #extract list elements
+# dim(y1) #classes
+# dim(y2) #bounding boxes
+# dim(x) #image tensor
 
 
 #model ----
@@ -407,9 +407,9 @@ model %>% fit_generator(
   train_gen,
   verbose = 2,
   steps_per_epoch = steps_per_epoch,
-  epochs = 5,
+  epochs = 10,
   callbacks = list(
-    callback_model_checkpoint(filepath = file.path("models", run_id, ""),
+    callback_model_checkpoint(filepath = file.path("models", run_id),
       save_weights_only = TRUE),
     callback_tensorboard(
       log_dir = file.path("logs", run_id), 
