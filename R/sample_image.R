@@ -12,8 +12,10 @@
 #' @param img_dir name of the image directory if it is in the working directory, or alternatively a filepath. Defaults to "source_photos".  
 #' @param label either "categories" or "name" indicating whether to print the category name or the category code. 
 #' @param cex a numeric determining the size of the label text.
+#' @param img_save_name path and filename to save the image (defaults to "data/temp_img.png) 
 
-sample_image <- function(img_data, img_name = "random",  img_dir = "source_photos", label = "categories", cex = 4){
+sample_image <- function(img_data, img_name = "random",  img_dir = "source_photos", 
+                         label = "categories", cex = 4, img_save_name = "data/temp_img.png"){
   
   ifelse(img_name == "random", 
          imginfo <- img_data[sample(nrow(img_data), 1),], #select a random image
@@ -50,6 +52,7 @@ sample_image <- function(img_data, img_name = "random",  img_dir = "source_photo
   }
   
   dev.off()
+  image_write(image = img, path = file.path(here(), img_save_name))
   print(img)
 }
 
